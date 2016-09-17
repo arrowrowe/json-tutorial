@@ -4,6 +4,8 @@
 
 #define EXPECT(c, ch)       do { assert(*c->json == (ch)); c->json++; } while(0)
 
+#define CHECK_RTN_OF_FUNC(e)  rtn = e; if (rtn != LEPT_PARSE_OK) return rtn;
+
 typedef struct {
     const char* json;
 }lept_context;
@@ -58,13 +60,15 @@ int lept_parse(lept_value* v, const char* json) {
     assert(v != NULL);
     c.json = json;
     v->type = LEPT_NULL;
+
     lept_parse_whitespace(&c);
-    rtn = lept_parse_value(&c, v);
-    if (rtn != LEPT_PARSE_OK)
-        return rtn;
+    CHECK_RTN_OF_FUNC(lept_parse_value(&c, v));
+
     lept_parse_whitespace(&c);
     if (*c.json != '\0')
         return LEPT_PARSE_ROOT_NOT_SINGULAR;
+
+    return LEPT_PARSE_OK;
 }
 
 lept_type lept_get_type(const lept_value* v) {
